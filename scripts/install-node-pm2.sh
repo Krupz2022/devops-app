@@ -1,24 +1,33 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_NAME="${PM2_NAME:-devops-app}"
-ENTRY="${ENTRY:-server.js}"
+NODE_MAJOR="${NODE_MAJOR:-20}"   # Node.js version (20 LTS default)
 
-cd ../
 
-# --- install project dependencies ---
-echo "Installing npm dependencies"
-if [ -f package-lock.json ]; then
-  npm ci
+export DEBIAN_FRONTEND=noninteractive
+
+# --- install Node.js (from NodeSource, not Ubuntu repo) ---
+echo "Installing prerequisites"
+apt-get update -y
+apt-get install -y curl ca-certificates gnupg
+
+if ! command -v node >/dev/null 2>&1 || ! node -v | grep -qE "v${NODE_MAJOR}\."; then
+  echo "Installing Node.js ${NODE_MAJOR}.x"
+  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /usr/share/keyrings/nodesource.gpg
+  echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" \
+    > /etc/apt/sources.list.d/nodesource.list
+  apt-get update -y
+  apt-get install -y nodejs
 else
-  npm install
+  echo "Node.js already installed: $(node -v)"
 fi
 
-# --- run with PM2 ---
-echo "Starting app with PM2: ${APP_NAME}"
-pm2 delete "${APP_NAME}" || true
-pm2 start "${ENTRY}" --name "${APP_NAME}" --update-env --time
-pm2 save
+# --- install PM2 ---
+if ! command -v pm2 >/dev/null 2>&1; then
+  echo "Installing PM2 globally"
+  npm install -g pm2
+else
+  echo "PM2 already installed: $(pm2 -v)"
+fi
 
-echo "Done! PM2 apps:"
-pm2 ls
+
