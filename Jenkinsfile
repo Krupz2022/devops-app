@@ -10,6 +10,7 @@ pipeline {
 
     stage('Install Node & PM2') {
       steps {
+        sh 'chmod 755 scripts/*'
         sh 'scripts/install-node-pm2.sh'
       }
     }
