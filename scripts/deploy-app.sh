@@ -4,7 +4,6 @@ set -euo pipefail
 APP_NAME="${PM2_NAME:-devops-app}"
 ENTRY="${ENTRY:-server.js}"
 
-cd ../
 
 # --- install project dependencies ---
 echo "Installing npm dependencies"
