@@ -9,8 +9,14 @@ pipeline {
   stages {
     stage('Prepare') {
       steps {
-        deleteDir()
+        sh 'echo "Workspace before cleanup: ${WORKSPACE}"; ls -la "${WORKSPACE}" || true'
+
+        sh 'rm -rf -- "${WORKSPACE%/}"/* || true'
+
+        sh 'echo "Workspace after cleanup:"; ls -la "${WORKSPACE}" || true'
+
         checkout scm
+
         script {
           def branchName = env.BRANCH_NAME ?: env.GIT_BRANCH ?: sh(returnStdout: true,
             script: "git rev-parse --abbrev-ref HEAD 2>/dev/null || git name-rev --name-only HEAD || true"
