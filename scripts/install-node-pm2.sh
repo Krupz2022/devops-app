@@ -3,9 +3,6 @@ set -euo pipefail
 
 NODE_MAJOR="${NODE_MAJOR:-20}"   # Node.js version (20 LTS default)
 
-
-export DEBIAN_FRONTEND=noninteractive
-
 # --- install Node.js (from NodeSource, not Ubuntu repo) ---
 echo "Installing prerequisites"
 sudo apt-get update -y
