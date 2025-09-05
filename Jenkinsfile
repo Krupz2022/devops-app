@@ -3,7 +3,7 @@ pipeline {
   options { timestamps() }
 
   parameters {
-    booleanParam(name: 'FORCE_BUILD', defaultValue: false, description: 'Set true to bypass commit-message check')
+    booleanParam(name: 'FORCE_BUILD', defaultValue: false, description: 'Set true to bypass commit-message and branch check')
   }
 
   stages {
@@ -12,10 +12,15 @@ pipeline {
         deleteDir()
         checkout scm
         script {
-          def branchName = sh(returnStdout: true, script: "git rev-parse --abbrev-ref HEAD").trim()
+          def branchName = env.BRANCH_NAME ?: env.GIT_BRANCH ?: sh(returnStdout: true,
+            script: "git rev-parse --abbrev-ref HEAD 2>/dev/null || git name-rev --name-only HEAD || true"
+          ).trim()
+
+          branchName = branchName.replaceAll(/^refs\\/heads\\//, '').replaceAll(/^origin\\//, '').trim().toLowerCase()
+
           def lastMsg = sh(returnStdout: true, script: "git log -1 --pretty=%B").trim()
 
-          echo "Branch: ${branchName}"
+          echo "Detected branch: ${branchName}"
           echo "Last commit message: ${lastMsg}"
 
           if (!params.FORCE_BUILD && !(branchName == 'main' && lastMsg.toLowerCase().contains('final'))) {
