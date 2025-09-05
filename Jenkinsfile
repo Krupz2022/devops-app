@@ -11,7 +11,7 @@ pipeline {
       steps {
         sh 'echo "Workspace before cleanup: ${WORKSPACE}"; ls -la "${WORKSPACE}" || true'
 
-        sh 'rm -rf -- "${WORKSPACE%/}"/* || true'
+        sh 'sudo rm -rf -- "${WORKSPACE%/}"/* || true'
 
         sh 'echo "Workspace after cleanup:"; ls -la "${WORKSPACE}" || true'
 
