@@ -1,6 +1,6 @@
 pipeline {
   agent any
-  options { timestamps() }
+  options { skipDefaultCheckout() }
 
   parameters {
     booleanParam(name: 'FORCE_BUILD', defaultValue: false, description: 'Set true to bypass commit-message and branch check')
