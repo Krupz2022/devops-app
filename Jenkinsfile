@@ -9,6 +9,7 @@ pipeline {
   stages {
     stage('Prepare') {
       steps {
+        deleteDir()
         checkout scm
         script {
           def branchName = sh(returnStdout: true, script: "git rev-parse --abbrev-ref HEAD").trim()
